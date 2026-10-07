@@ -1,0 +1,32 @@
+# Seed configuration for feeds.
+# `meepo sync-config` reads this file and writes the feeds into the database.
+# After that, the database is the source of truth (see PLAN.md, "Decision: where configuration lives").
+#
+# Fields:
+#   name                  display name
+#   url                   feed URL (must be unique)
+#   category              free-text group, used for digests later
+#   enabled               false skips the feed without deleting it
+#   fetch_interval_min    minimum minutes between fetches of this feed
+#   max_item_age_days     items older than this are ignored
+#   include_keywords      keep an item only if its text matches one of these (empty = keep all)
+#   exclude_keywords      drop an item if its text matches any of these
+
+feeds:
+  - name: Hacker News
+    url: https://hnrss.org/frontpage
+    category: tech
+    enabled: true
+    fetch_interval_min: 60
+    max_item_age_days: 2
+    include_keywords: []
+    exclude_keywords: []
+
+  - name: Python Insider
+    url: https://blog.python.org/feeds/posts/default
+    category: programming
+    enabled: true
+    fetch_interval_min: 360
+    max_item_age_days: 30
+    include_keywords: []
+    exclude_keywords: []

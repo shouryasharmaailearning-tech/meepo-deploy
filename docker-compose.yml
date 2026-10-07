@@ -1,0 +1,51 @@
+# Deploy docker-compose.yml for meepo (https://github.com/shouryasharmaailearning-tech/meepo).
+# Pulls the published image from GHCR instead of building it — nothing to clone or
+# compile here, just this file and a .env (see .env.example).
+#
+# Quick start:
+#   cp .env.example .env            # fill in whatever you want to use
+#   docker compose run --rm meepo db upgrade
+#   docker compose up -d web         # http://localhost:8000
+#   docker compose run --rm meepo run --since 1d
+#
+# See feeds.example.yaml for a starting feed list and
+# https://github.com/shouryasharmaailearning-tech/meepo for full docs.
+
+services:
+  meepo:
+    image: ghcr.io/shouryasharmaailearning-tech/meepo:v0.1.0
+    environment:
+      - MEEPO_DB_URL=sqlite:////data/meepo.db
+      - OBSIDIAN_VAULT=/vault
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
+      - MEEPO_LLM_PROVIDER=${MEEPO_LLM_PROVIDER:-ollama}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - meepo-data:/data
+      - ./vault:/vault
+    extra_hosts:
+      # Lets the container reach Ollama running on the host, for the default local
+      # provider. Automatic on Docker Desktop (Mac/Windows); needed on Linux.
+      - "host.docker.internal:host-gateway"
+
+  web:
+    image: ghcr.io/shouryasharmaailearning-tech/meepo:v0.1.0
+    command: ["web", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    environment:
+      - MEEPO_DB_URL=sqlite:////data/meepo.db
+      - OBSIDIAN_VAULT=/vault
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
+      - MEEPO_LLM_PROVIDER=${MEEPO_LLM_PROVIDER:-ollama}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - meepo-data:/data
+      - ./vault:/vault
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  meepo-data:
